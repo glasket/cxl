@@ -13,9 +13,23 @@
  * @version 0.1.0
  */
 
+// TODO append_utfXX versions
+// TODO shrink functions (shrink, shrink_to_fit)
+// TODO more manip functions, like pop, remove, insert, replace, etc.
+
 #pragma once
-#include <stdint.h>
+#include <stddef.h>
 #include <uchar.h>
+#if __STDC_VERSION__ < 202311L
+#define char8_t unsigned char
+#include <stdbool.h>
+#endif
+
+typedef enum StringError {
+  STRING_OK = 0,
+  STRING_ERR_ALLOC = 1,
+  STRING_ERR_INVALID_UTF8 = 2,
+} StringError;
 
 /**
  * @typedef String
@@ -24,10 +38,21 @@
 typedef struct str String;
 
 /**
+ * @typedef StringView
+ * @brief Provides a fixed-width view over an underlying @ref String.
+ *
+ * @warning If the underlying @ref String mutates then accessing the StringView
+ * may result in undefined behavior.
+ *
+ * @remark This is effectively a fat pointer a la Rust's `&str`.
+ */
+typedef struct strv StringView;
+
+/**
  * @brief Creates and returns an empty string.
  *
  * @return pointer to the new empty string.
- * @retval `NULL` if the string could not be created.
+ * @retval `nullptr` if the string could not be created.
  */
 String *string_new();
 
@@ -37,7 +62,7 @@ String *string_new();
  * @param[in] capacity the capacity for the new string.
  *
  * @return pointer to the new empty string.
- * @retval `NULL` if the string could not be created.
+ * @retval `nullptr` if the string could not be created.
  */
 String *string_new_with_capacity(const size_t capacity);
 
@@ -48,7 +73,7 @@ String *string_new_with_capacity(const size_t capacity);
  * @param[in] length the length of the `data` sequence.
  *
  * @return pointer to the new empty string.
- * @retval `NULL` if the string could not be created.
+ * @retval `nullptr` if the string could not be created.
  */
 String *string_from_bytes(const char8_t *data, const size_t length);
 
@@ -58,7 +83,7 @@ String *string_from_bytes(const char8_t *data, const size_t length);
  * @param[in] stringView the StringView to create the string from.
  *
  * @return pointer to the new empty string.
- * @retval `NULL` if the string could not be created.
+ * @retval `nullptr` if the string could not be created.
  */
 String *string_from_string_view(const StringView stringView);
 
@@ -67,33 +92,48 @@ String *string_from_string_view(const StringView stringView);
  *
  * @param[in,out] string the string to append to.
  * @param[in] other the character to append.
+ *
+ * @return StringError
+ * @retval STRING_OK if the character was appended successfully.
+ * @retval STRING_ERR_ALLOC if the string could not be reallocated.
  */
-void string_append_byte(String *string, const char8_t other);
+StringError string_append_byte(String *string, const char8_t other);
 
 /**
  * @brief Appends a byte sequence to the end of the string.
  *
  * @param[in,out] string the string to append to.
  * @param[in] other the byte sequence to append.
- * @param[in] otherLength the length of the character array.
+ * @param[in] otherLength the length of the byte sequence.
+ *
+ * @return StringError
+ * @retval STRING_OK if the byte sequence was appended successfully.
+ * @retval STRING_ERR_ALLOC if the string could not be reallocated.
  */
-void string_append_bytes(String *string, const char8_t *other,
-                         int otherLength);
+StringError string_append_bytes(String *string, const char8_t *other, const size_t otherLength);
 
 /**
  * @brief Appends a String to the end of the string.
  *
  * @param[in,out] string the string to append to.
  * @param[in] other the String to append.
+ *
+ * @return StringError
+ * @retval STRING_OK if the String was appended successfully.
+ * @retval STRING_ERR_ALLOC if the string could not be reallocated.
  */
-void string_append_string(String *string, const String *other);
+StringError string_append_string(String *string, const String *other);
 
 /**
  * @brief Appends a StringView to the end of the string.
  * @param[in,out] string the string to append to.
  * @param[in] other the StringView to append.
+ *
+ * @return StringError
+ * @retval STRING_OK if the StringView was appended successfully.
+ * @retval STRING_ERR_ALLOC if the string could not be reallocated.
  */
-void string_append_string_view(String *string, const StringView *other);
+StringError string_append_string_view(String *string, const StringView other);
 
 /**
  * @brief Slices and returns a view of the string from `start` to `end`.
@@ -103,7 +143,7 @@ void string_append_string_view(String *string, const StringView *other);
  * @param[in] end the end index of the slice.
  *
  * @return a view of the string from `start` to `end`.
- * @retval `NULL` if the slice could not be created.
+ * @retval `nullptr` if the slice could not be created.
  */
 StringView string_slice(const String *string, const size_t start, const size_t end);
 
@@ -113,7 +153,7 @@ StringView string_slice(const String *string, const size_t start, const size_t e
  * @param[in] string the string to get the length of.
  *
  * @return the length of the string.
- * @retval `0` if the string is `NULL`.
+ * @retval `0` if the string is `nullptr`.
  */
 size_t string_len(String *string);
 
@@ -123,7 +163,7 @@ size_t string_len(String *string);
  * @param[in] string the string to get the capacity of.
  *
  * @return the capacity of the string.
- * @retval `0` if the string is `NULL`.
+ * @retval `0` if the string is `nullptr`.
  */
 size_t string_cap(String *string);
 
@@ -163,23 +203,12 @@ void string_reserve(String *string, const size_t additional);
 void string_free(String *string);
 
 /**
- * @typedef StringView
- * @brief Provides a fixed-width view over an underlying @ref String.
- *
- * @warning If the underlying @ref String mutates then accessing the StringView
- * may result in undefined behavior.
- *
- * @remark This is effectively a fat pointer a la Rust's `&str`.
- */
-typedef struct strv StringView;
-
-/**
  * @brief Creates and returns a StringView of the given byte sequence.
  *
  * @param[in] data the byte sequence to create the StringView on.
  *
  * @return a StringView of the given byte sequence.
- * @retval `NULL` if the StringView could not be created.
+ * @retval `nullptr` if the StringView could not be created.
  */
 StringView string_view_from_bytes(const char8_t *data, const size_t length);
 
@@ -189,7 +218,7 @@ StringView string_view_from_bytes(const char8_t *data, const size_t length);
  * @param[in] string the string to create the StringView on.
  *
  * @return a StringView of the given String.
- * @retval `NULL` if the StringView could not be created.
+ * @retval `nullptr` if the StringView could not be created.
  */
 StringView string_view_from_string(const String *string);
 
@@ -201,7 +230,6 @@ StringView string_view_from_string(const String *string);
  * @param[in] end the end index of the slice.
  *
  * @return a new StringView that's a slice of the given StringView.
- * @retval `NULL` if the StringView could not be created.
+ * @retval `nullptr` if the StringView could not be created.
  */
-StringView string_view_slice(const StringView stringView, const size_t start,
-                             const size_t end);
+StringView string_view_slice(const StringView stringView, const size_t start, const size_t end);
