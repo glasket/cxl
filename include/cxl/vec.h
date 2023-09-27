@@ -14,12 +14,17 @@
  */
 
 #pragma once
+#ifndef CXL_VEC_H
+#define CXL_VEC_H
+#include "mem.h"
 #include <stddef.h>
 #include <stdlib.h>
 
 #define vec_new_of(type, capacity) vec_new(capacity, sizeof(type))
 
-typedef struct vec Vec;
+typedef struct Vec Vec;
+
+typedef struct Slice Slice;
 
 /**
  * @brief Create a new vector.
@@ -28,9 +33,9 @@ typedef struct vec Vec;
  * @return a pointer to the new vector.
  * @retval nullptr if memory allocation failed.
  */
-Vec *vec_new(size_t cap, size_t size);
+Vec *vec_new(const size_t cap, const size_t size);
 
-Vec *vec_new_zeroed(size_t cap, size_t size);
+Vec *vec_new_zeroed(const size_t cap, const size_t size);
 
 /**
  * @brief Free a vector.
@@ -38,6 +43,14 @@ Vec *vec_new_zeroed(size_t cap, size_t size);
  */
 void vec_free(Vec *vec);
 
-void vec_grow(Vec *vec);
+MemErr vec_reserve(Vec *vec, size_t additional);
 
-void vec_shrink(Vec *vec);
+MemErr vec_reserve_exact(Vec *vec, size_t cap);
+
+MemErr vec_shrink(Vec *vec);
+
+void *vec_get(Vec *vec, size_t idx);
+
+void vec_set(Vec *vec, size_t idx, void *val);
+
+#endif

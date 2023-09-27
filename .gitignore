@@ -4,3 +4,6 @@
 build/
 bin/
 docs/
+
+spec/*
+!spec/spec.tex

@@ -1,4 +1,6 @@
 ﻿BasedOnStyle: Microsoft
+AlignAfterOpenBracket: BlockIndent
+AllowAllParametersOfDeclarationOnNextLine: false
 BreakBeforeBraces: Attach
 ColumnLimit: 120
 IndentWidth: 2

@@ -13,13 +13,28 @@
  * @version 0.1.0
  */
 
+#pragma once
+#ifndef CXL_CKDINT_H
+#define CXL_CKDINT_H
+
+// TODO Rewrite
 #ifdef __has_include
+
 #if __has_include("<stdckdint.h>")
 #include <stdckdint.h>
 #define CKDINT_IMPL_EXISTS 1
 #endif
+
+#else
+
+#ifdef(defined(__STDC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 202311L))
+#include <stdckdint.h>
+#define CKDINT_IMPL_EXISTS 1
 #endif
 
+#endif
+
+// Builtins fallback
 #if !defined CKDINT_IMPL_EXISTS && __has_builtin(__builtin_add_overflow) && __has_builtin(__builtin_mul_overflow) &&   \
     __has_builtin(__builtin_sub_overflow)
 #define CKDINT_IMPL_EXISTS 1
@@ -28,6 +43,9 @@
 #define ckd_sub(result, a, b) __builtin_sub_overflow(a, b, result)
 #endif
 
+// TODO Add basic fallbacks?
 #if !defined CKDINT_IMPL_EXISTS
-#error "No implementation of ckdint found. Please use a compiler that has builtins or implements stdckdint."
+#error "stdckdint.h not found, and compiler does not support builtins for overflow checking."
+#endif
+
 #endif

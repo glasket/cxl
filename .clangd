@@ -1,13 +1,7 @@
 CompileFlags:
-  Add: [-Wall, -Wextra, --std=c2x, -pedantic, -ferror-limit=128, -xc]
+  Remove: [-xobjective-c++-header]
+  Add: [-Wall, -Wextra, --std=c2x, -pedantic, -ferror-limit=128, -xc, -I../include/, -fstrict-flex-arrays=2]
   Compiler: clang
 
 Index:
   StandardLibrary: No
-
-If:
-  PathMatch: .*\.h$
-
-CompileFlags:
-  Remove: -xc
-  Add: -xc-header
