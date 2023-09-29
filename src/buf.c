@@ -63,8 +63,8 @@ XMemErr xbuf_grow_by(XBuffer *buf, const size_t increase) {
 }
 
 XMemErr xbuf_set_cap(XBuffer *buf, const size_t cap) {
-  if (cap == 0) {
-    return MEM_ERR_INVALID_SET;
+  if (cap == buf->layout.size) {
+    return MEM_OK; // Setting size to what it already is
   }
 
   void *new_buffer = buf->alloc->realloc(
