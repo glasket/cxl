@@ -19,36 +19,35 @@
 #include "alloc.h"
 #include <stdlib.h>
 
-typedef struct Buffer Buffer;
+typedef struct XBuffer XBuffer;
 
-Buffer *buf_new(const Layout layout, const Allocator *const alloc);
+XBuffer *xbuf_new(const XLayout layout, const XAllocator *const alloc);
 
 /**
  * @brief Frees the buffer
  *
  * @param[in,out] buf The buffer to free. Set to nullptr after freeing.
  */
-void buf_free(Buffer *buf);
+void xbuf_free(XBuffer *buf);
 
-MemErr buf_grow(Buffer *buf);
+XMemErr xbuf_grow(XBuffer *buf);
 
-MemErr buf_grow_by(Buffer *buf, const size_t increase); // Equivalent to RawVec.Reserve
+XMemErr xbuf_grow_by(XBuffer *buf, const size_t increase); // Equivalent to RawVec.Reserve
 
-MemErr buf_set_cap(Buffer *buf, const size_t cap);
+XMemErr xbuf_set_cap(XBuffer *buf, const size_t cap);
 
-size_t buf_cap(const Buffer *const buf);
+size_t xbuf_cap(const XBuffer *const buf);
 
-size_t buf_alignment(const Buffer *const buf);
+size_t xbuf_alignment(const XBuffer *const buf);
 
 // TODO Maybe allow buf_realign?
 
-void *buf_access(const Buffer *const buf, const size_t offset);
+void *xbuf_access(const XBuffer *const buf, const size_t offset);
 
-// TODO
 // Converts an existing pointer into a buffer, copies the data.
-Buffer *buf_from_ptr(void *const ptr, const Layout layout, const Allocator *const alloc);
+XBuffer *xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc);
 
 // Returns the pointer to the buffer's data. nullptr if the buffer is empty.
-void *buf_ptr(const Buffer *const buf);
+void *xbuf_ptr(const XBuffer *const buf);
 
 #endif

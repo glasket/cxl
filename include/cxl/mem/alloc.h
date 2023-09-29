@@ -18,18 +18,18 @@
 #define CXL_MEM_ALLOC_H
 #include <stddef.h>
 
-typedef enum mem_err {
+typedef enum xmem_err {
   MEM_OK = 0,
   MEM_ERR_ALLOC,
   MEM_ERR_OVERFLOW,
   MEM_ERR_INVALID_SET,
   MEM_ERR_INVALID_SHRINK,
-} MemErr;
+} XMemErr;
 
-typedef struct Layout {
+typedef struct XLayout {
   size_t size;
   size_t alignment;
-} Layout;
+} XLayout;
 
 /**
  * @brief Allocates a new buffer with the specified layout.
@@ -39,7 +39,7 @@ typedef struct Layout {
  * @return Pointer to the allocated buffer.
  * @retval nullptr if allocation failed.
  */
-typedef void *(*cxl_mem_allocate)(const Layout layout, const size_t pad);
+typedef void *(*cxl_mem_allocate)(const XLayout layout, const size_t pad);
 
 /**
  * @brief Reallocates a buffer with the specified layout.
@@ -52,7 +52,7 @@ typedef void *(*cxl_mem_allocate)(const Layout layout, const size_t pad);
  * @retval nullptr if reallocation failed.
  */
 typedef void *(*cxl_mem_reallocate)(
-    void *const ptr, const Layout old_layout, const Layout new_layout, const size_t pad
+    void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad
 );
 
 /**
@@ -63,11 +63,11 @@ typedef void *(*cxl_mem_reallocate)(
  */
 typedef void (*cxl_mem_deallocate)(void *const buf, const size_t full_size);
 
-typedef struct Allocator {
+typedef struct XAllocator {
   cxl_mem_allocate alloc;
   cxl_mem_reallocate realloc;
   cxl_mem_deallocate free;
-} Allocator;
+} XAllocator;
 
 // TODO Maybe rewrite cxl_mem_allocate to be more like calloc API?
 // This would help when implementing NodeList since it would assist with limiting
@@ -75,27 +75,27 @@ typedef struct Allocator {
 // allocate N nodes of size sizeof(Node) and if the allocator is non-contiguous
 // it could notify the nodelist how many nodes were allocated so that it can
 // attempt to allocate the remaining nodes again.
-// Buffer would of course just use alloc(1, Layout, pad).
+// Buffer would of course just use alloc(1, XLayout, pad).
 // (NodeList is a planned memory representation for non-contiguous allocators, like
 // linked block arenas.)
 
-void *balloc(const Layout layout, const size_t pad);
-void *zballoc(const Layout layout, const size_t pad);
+void *balloc(const XLayout layout, const size_t pad);
+void *zballoc(const XLayout layout, const size_t pad);
 
-void *brealloc(void *const ptr, const Layout old_layout, const Layout new_layout, const size_t pad);
-void *zbrealloc(void *const ptr, const Layout old_layout, const Layout new_layout, const size_t pad);
+void *brealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad);
+void *zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad);
 
 void bfree(void *const ptr, const size_t full_size);
 void zbfree(void *const ptr, const size_t full_size);
 
-const Allocator GlobalAllocator = {
+const XAllocator GlobalAllocator = {
     .alloc = balloc,
     .realloc = brealloc,
     .free = bfree,
 };
 
 // Also does overflow checks
-const Allocator ZeroAllocator = {
+const XAllocator ZeroAllocator = {
     .alloc = zballoc,
     .realloc = zbrealloc,
     .free = zbfree,

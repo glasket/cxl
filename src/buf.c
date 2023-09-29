@@ -19,40 +19,37 @@
 #include <stdint.h>
 #include <string.h>
 
-struct Buffer {
-  const Allocator *const alloc;
-  Layout layout;
+struct XBuffer {
+  const XAllocator *const alloc;
+  XLayout layout;
   uint8_t mem[];
 };
 
-Buffer *buf_new(const Layout layout, const Allocator *const alloc) {
+XBuffer *xbuf_new(const XLayout layout, const XAllocator *const alloc) {
   if (layout.alignment == 0) {
     return nullptr;
   }
-  Buffer *buf = alloc->alloc(layout, sizeof(Buffer));
+  XBuffer *buf = alloc->alloc(layout, sizeof(XBuffer));
   if (buf == nullptr) {
     return nullptr;
   }
 
   buf->layout = layout;
   // Casting to init the allocator pointer
-  *((Allocator **)buf->alloc) = (Allocator *)alloc;
+  *((XAllocator **)buf->alloc) = (XAllocator *)alloc;
   return buf;
 }
 
-void buf_free(Buffer *buf) {
-  if (buf == nullptr) {
-    return;
-  }
+void xbuf_free(XBuffer *buf) {
   free(buf);
   buf = nullptr;
 }
 
-MemErr buf_grow(Buffer *buf) {
-  return buf_grow_by(buf, buf->layout.size == 0 ? 1 : buf->layout.size);
+XMemErr xbuf_grow(XBuffer *buf) {
+  return xbuf_grow_by(buf, buf->layout.size == 0 ? 1 : buf->layout.size);
 }
 
-MemErr buf_grow_by(Buffer *buf, const size_t increase) {
+XMemErr xbuf_grow_by(XBuffer *buf, const size_t increase) {
   if (increase == 0) {
     return MEM_OK; // Grow by nothing is fine
   }
@@ -62,16 +59,17 @@ MemErr buf_grow_by(Buffer *buf, const size_t increase) {
     return MEM_ERR_OVERFLOW;
   }
 
-  return buf_set_cap(buf, new_cap);
+  return xbuf_set_cap(buf, new_cap);
 }
 
-MemErr buf_set_cap(Buffer *buf, const size_t cap) {
+XMemErr xbuf_set_cap(XBuffer *buf, const size_t cap) {
   if (cap == 0) {
     return MEM_ERR_INVALID_SET;
   }
 
-  void *new_buffer =
-      buf->alloc->realloc(buf, buf->layout, (Layout){.alignment = buf->layout.alignment, .size = cap}, sizeof(Buffer));
+  void *new_buffer = buf->alloc->realloc(
+      buf, buf->layout, (XLayout){.alignment = buf->layout.alignment, .size = cap}, sizeof(XBuffer)
+  );
   if (new_buffer == nullptr) {
     return MEM_ERR_ALLOC;
   }
@@ -81,23 +79,23 @@ MemErr buf_set_cap(Buffer *buf, const size_t cap) {
   return MEM_OK;
 }
 
-size_t buf_cap(const Buffer *const buf) {
+size_t xbuf_cap(const XBuffer *const buf) {
   return buf->layout.size;
 }
 
-size_t buf_alignment(const Buffer *const buf) {
+size_t xbuf_alignment(const XBuffer *const buf) {
   return buf->layout.alignment;
 }
 
-void *buf_access(const Buffer *const buf, const size_t offset) {
+void *xbuf_access(const XBuffer *const buf, const size_t offset) {
   if (offset >= buf->layout.size) {
     return nullptr;
   }
   return (void *)&buf->mem[offset * buf->layout.alignment];
 }
 
-Buffer *buf_from_ptr(void *const ptr, const Layout layout, const Allocator *const alloc) {
-  Buffer *buf = buf_new(layout, alloc);
+XBuffer *xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc) {
+  XBuffer *buf = xbuf_new(layout, alloc);
   if (buf == nullptr) {
     return nullptr;
   }
@@ -105,6 +103,9 @@ Buffer *buf_from_ptr(void *const ptr, const Layout layout, const Allocator *cons
   return buf;
 }
 
-void *buf_ptr(const Buffer *const buf) {
+void *xbuf_ptr(const XBuffer *const buf) {
+  if (buf == nullptr || buf->layout.size == 0) {
+    return nullptr;
+  }
   return (void *)buf->mem;
 }

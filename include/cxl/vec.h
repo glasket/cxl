@@ -43,11 +43,11 @@ Vec *vec_new_zeroed(const size_t cap, const size_t size);
  */
 void vec_free(Vec *vec);
 
-MemErr vec_reserve(Vec *vec, size_t additional);
+XMemErr vec_reserve(Vec *vec, size_t additional);
 
-MemErr vec_reserve_exact(Vec *vec, size_t cap);
+XMemErr vec_reserve_exact(Vec *vec, size_t cap);
 
-MemErr vec_shrink(Vec *vec);
+XMemErr vec_shrink(Vec *vec);
 
 void *vec_get(Vec *vec, size_t idx);
 
