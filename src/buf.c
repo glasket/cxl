@@ -5,8 +5,8 @@
  */
 
 /**
- * @file mem.c
- * @brief Memory management utilities for CXL.
+ * @file buf.c
+ * @brief Buffer type representing contiguous memory for CXL.
  * @author Christian Sigmon 'Glasket' <cws@glasket.com>
  * @date 2023-
  * @copyright MPL-2.0

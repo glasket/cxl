@@ -5,8 +5,8 @@
  */
 
 /**
- * @file mem.h
- * @brief Memory representation objects for CXL.
+ * @file buf.h
+ * @brief Buffer type representing contiguous memory for CXL.
  * @author Christian Sigmon 'Glasket' <cws@glasket.com>
  * @date 2023-
  * @copyright MPL-2.0
@@ -14,8 +14,8 @@
  */
 
 #pragma once
-#ifndef CXL_MEM_H
-#define CXL_MEM_H
+#ifndef CXL_MEM_BUF_H
+#define CXL_MEM_BUF_H
 #include "alloc.h"
 #include <stdlib.h>
 
