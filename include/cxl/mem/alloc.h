@@ -1,4 +1,21 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
+/**
+ * @file alloc.h
+ * @brief Allocators.
+ * @author Christian Sigmon 'Glasket' <cws@glasket.com>
+ * @date 2023-
+ * @copyright MPL-2.0
+ * @version 0.1.0
+ */
+
+#pragma once
+#ifndef CXL_MEM_ALLOC_H
+#define CXL_MEM_ALLOC_H
 #include <stddef.h>
 
 typedef enum mem_err {
@@ -52,6 +69,16 @@ typedef struct Allocator {
   cxl_mem_deallocate free;
 } Allocator;
 
+// TODO Maybe rewrite cxl_mem_allocate to be more like calloc API?
+// This would help when implementing NodeList since it would assist with limiting
+// fragmentation and the number of alloc calls. i.e. the allocator could try to
+// allocate N nodes of size sizeof(Node) and if the allocator is non-contiguous
+// it could notify the nodelist how many nodes were allocated so that it can
+// attempt to allocate the remaining nodes again.
+// Buffer would of course just use alloc(1, Layout, pad).
+// (NodeList is a planned memory representation for non-contiguous allocators, like
+// linked block arenas.)
+
 void *balloc(const Layout layout, const size_t pad);
 void *zballoc(const Layout layout, const size_t pad);
 
@@ -73,3 +100,5 @@ const Allocator ZeroAllocator = {
     .realloc = zbrealloc,
     .free = zbfree,
 };
+
+#endif

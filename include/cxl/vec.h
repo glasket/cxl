@@ -16,7 +16,7 @@
 #pragma once
 #ifndef CXL_VEC_H
 #define CXL_VEC_H
-#include "mem.h"
+#include "mem/alloc.h"
 #include <stddef.h>
 #include <stdlib.h>
 
