@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static size_t layout_size(const Layout layout, const size_t pad) {
+static size_t layout_size(const XLayout layout, const size_t pad) {
   if (layout.size == 0 || layout.alignment == 0) {
     return 0;
   }
@@ -18,11 +18,11 @@ static size_t layout_size(const Layout layout, const size_t pad) {
   return total;
 }
 
-static bool layout_eq(const Layout a, const Layout b) {
+static bool layout_eq(const XLayout a, const XLayout b) {
   return a.size == b.size && a.alignment == b.alignment;
 }
 
-void *balloc(const Layout layout, const size_t pad) {
+void *balloc(const XLayout layout, const size_t pad) {
   size_t total = layout_size(layout, pad);
   if (total == 0) {
     return nullptr;
@@ -30,7 +30,7 @@ void *balloc(const Layout layout, const size_t pad) {
   return malloc(total);
 }
 
-void *zballoc(const Layout layout, const size_t pad) {
+void *zballoc(const XLayout layout, const size_t pad) {
   size_t total = layout_size(layout, pad);
   if (total == 0) {
     return nullptr;
@@ -38,7 +38,7 @@ void *zballoc(const Layout layout, const size_t pad) {
   return calloc(1, total);
 }
 
-void *brealloc(void *const ptr, const Layout old_layout, const Layout new_layout, const size_t pad) {
+void *brealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad) {
   size_t total = layout_size(new_layout, pad);
   if (total == 0) {
     return nullptr;
@@ -46,7 +46,7 @@ void *brealloc(void *const ptr, const Layout old_layout, const Layout new_layout
   return realloc(ptr, total);
 }
 
-void *zbrealloc(void *const ptr, const Layout old_layout, const Layout new_layout, const size_t pad) {
+void *zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad) {
   if (layout_eq(old_layout, new_layout)) {
     return ptr;
   }

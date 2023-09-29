@@ -20,11 +20,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define vec_new_of(type, capacity) vec_new(capacity, sizeof(type))
+typedef struct XVec XVec;
 
-typedef struct Vec Vec;
-
-typedef struct Slice Slice;
+typedef struct XSlice XSlice;
 
 /**
  * @brief Create a new vector.
@@ -33,24 +31,32 @@ typedef struct Slice Slice;
  * @return a pointer to the new vector.
  * @retval nullptr if memory allocation failed.
  */
-Vec *vec_new(const size_t cap, const size_t size);
+XVec xvec_new(const size_t cap, const size_t elem_size);
 
-Vec *vec_new_zeroed(const size_t cap, const size_t size);
+XVec xvec_new_with_alloc(const size_t cap, const size_t elem_size, const XAllocator *const alloc);
 
 /**
  * @brief Free a vector.
  * @param[in] vec the vector to free.
  */
-void vec_free(Vec *vec);
+void xvec_free(XVec *vec);
 
-XMemErr vec_reserve(Vec *vec, size_t additional);
+XMemErr xvec_reserve(XVec *vec, size_t additional);
 
-XMemErr vec_reserve_exact(Vec *vec, size_t cap);
+XMemErr xvec_reserve_exact(XVec *vec, size_t cap);
 
-XMemErr vec_shrink(Vec *vec);
+XMemErr xvec_shrink(XVec *vec);
 
-void *vec_get(Vec *vec, size_t idx);
+void *xvec_get(XVec *vec, size_t idx);
 
-void vec_set(Vec *vec, size_t idx, void *val);
+XMemErr xvec_set(XVec *vec, size_t idx, void *val);
+
+XMemErr xvec_push(XVec *vec, void *val);
+
+void *xvec_pop(XVec *vec);
+
+size_t xvec_cap(XVec vec);
+
+size_t xvec_len(XVec vec);
 
 #endif

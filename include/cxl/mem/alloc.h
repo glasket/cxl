@@ -24,6 +24,7 @@ typedef enum xmem_err {
   MEM_ERR_OVERFLOW,
   MEM_ERR_INVALID_SET,
   MEM_ERR_INVALID_SHRINK,
+  MEM_ERR_OOB
 } XMemErr;
 
 typedef struct XLayout {
