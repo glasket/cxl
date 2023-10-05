@@ -15,29 +15,49 @@
 
 #include "ckdint.h"
 #include "common.h"
+#include "cxl/mem/alloc.h"
 #include <cxl/mem/buf.h>
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 struct XBuffer {
-  const XAllocator *const alloc;
+  XAllocator *alloc;
   XLayout layout;
   uint8_t mem[];
 };
 
-XBuffer *xbuf_new(const XLayout layout, const XAllocator *const alloc) {
+static XErr internal_xbuf_set_cap(XBuffer **buf, const size_t cap) {
+  if (cap == (*buf)->layout.size) {
+    return X_OK; // Setting size to what it already is
+  }
+
+  void *new_buffer = (*buf)->alloc->realloc(
+      *buf, (*buf)->layout, (XLayout){.alignment = (*buf)->layout.alignment, .size = cap}, sizeof(XBuffer)
+  );
+  if (new_buffer == nullptr) {
+    return X_ERR_ALLOC;
+  }
+
+  *buf = new_buffer;
+  (*buf)->layout.size = cap;
+  return X_OK;
+}
+
+XResult xbuf_new(const XLayout layout, const XAllocator *const alloc) {
   if (layout.alignment == 0) {
-    return nullptr;
+    return xres_err(X_ERR_BAD_ALIGNMENT);
   }
   XBuffer *buf = alloc->alloc(layout, sizeof(XBuffer));
   if (buf == nullptr) {
-    return nullptr;
+    return xres_err(X_ERR_ALLOC);
   }
 
   buf->layout = layout;
   // Casting to init the allocator pointer
-  *((XAllocator **)buf->alloc) = (XAllocator *)alloc;
-  return buf;
+  buf->alloc = (XAllocator *)alloc;
+  return xres_ok(buf);
 }
 
 void xbuf_free(XBuffer *buf) {
@@ -45,38 +65,25 @@ void xbuf_free(XBuffer *buf) {
   buf = nullptr;
 }
 
-XMemErr xbuf_grow(XBuffer *buf) {
-  return xbuf_grow_by(buf, buf->layout.size == 0 ? 1 : buf->layout.size);
+XErr xbuf_grow(XBuffer **buf) {
+  return xbuf_grow_by(buf, (*buf)->layout.size == 0 ? 1 : (*buf)->layout.size);
 }
 
-XMemErr xbuf_grow_by(XBuffer *buf, const size_t increase) {
+XErr xbuf_grow_by(XBuffer **buf, const size_t increase) {
   if (increase == 0) {
-    return MEM_OK; // Grow by nothing is fine
+    return X_OK; // Grow by nothing is fine
   }
 
   size_t new_cap = 0;
-  if (ckd_add(&new_cap, buf->layout.size, increase)) {
-    return MEM_ERR_OVERFLOW;
+  if (ckd_add(&new_cap, (*buf)->layout.size, increase)) {
+    return X_ERR_OVERFLOW;
   }
 
   return xbuf_set_cap(buf, new_cap);
 }
 
-XMemErr xbuf_set_cap(XBuffer *buf, const size_t cap) {
-  if (cap == buf->layout.size) {
-    return MEM_OK; // Setting size to what it already is
-  }
-
-  void *new_buffer = buf->alloc->realloc(
-      buf, buf->layout, (XLayout){.alignment = buf->layout.alignment, .size = cap}, sizeof(XBuffer)
-  );
-  if (new_buffer == nullptr) {
-    return MEM_ERR_ALLOC;
-  }
-
-  buf = new_buffer;
-  buf->layout.size = cap;
-  return MEM_OK;
+XErr xbuf_set_cap(XBuffer **buf, const size_t cap) {
+  return internal_xbuf_set_cap(buf, cap);
 }
 
 size_t xbuf_cap(const XBuffer *const buf) {
@@ -87,25 +94,26 @@ size_t xbuf_alignment(const XBuffer *const buf) {
   return buf->layout.alignment;
 }
 
-void *xbuf_access(const XBuffer *const buf, const size_t offset) {
+XResult xbuf_access(XBuffer *const buf, const size_t offset) {
   if (offset >= buf->layout.size) {
-    return nullptr;
+    return xres_err(X_ERR_BOUNDS);
   }
-  return (void *)&buf->mem[offset * buf->layout.alignment];
+  return xres_ok(&buf->mem[offset * buf->layout.alignment]);
 }
 
-XBuffer *xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc) {
-  XBuffer *buf = xbuf_new(layout, alloc);
-  if (buf == nullptr) {
-    return nullptr;
+XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc) {
+  XResult res = xbuf_new(layout, alloc);
+  if (res.is_err) {
+    return res;
   }
+  XBuffer *buf = res.res.ptr;
   memcpy(buf->mem, ptr, layout.size * layout.alignment);
-  return buf;
+  return xres_ok(buf);
 }
 
-void *xbuf_ptr(const XBuffer *const buf) {
+XOption xbuf_ptr(XBuffer *const buf) {
   if (buf == nullptr || buf->layout.size == 0) {
-    return nullptr;
+    return xopt_none();
   }
-  return (void *)buf->mem;
+  return xopt_some(buf->mem);
 }

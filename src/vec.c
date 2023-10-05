@@ -14,7 +14,6 @@
  */
 
 #include "common.h"
-#include <cxl/mem/alloc.h>
 #include <cxl/mem/buf.h>
 #include <cxl/vec.h>
 #include <string.h>
@@ -25,7 +24,7 @@ struct XVec {
 };
 
 static XVec internal_vec_new(const size_t cap, const size_t elem_size, const XAllocator *const alloc) {
-  return (XVec){.buf = xbuf_new((XLayout){.size = cap, .alignment = elem_size}, alloc), .len = 0};
+  return (XVec){.buf = xres_unwrap(xbuf_new((XLayout){.size = cap, .alignment = elem_size}, alloc)), .len = 0};
 }
 
 XVec xvec_new(const size_t cap, const size_t elem_size) {
@@ -41,51 +40,57 @@ void vec_free(XVec vec) {
   vec.buf = nullptr;
 }
 
-XMemErr xvec_reserve(XVec *vec, size_t additional) {
-  return xbuf_grow_by(vec->buf, additional);
+XErr xvec_reserve(XVec *vec, size_t additional) {
+  return xbuf_grow_by(&vec->buf, additional);
 }
 
-XMemErr xvec_reserve_exact(XVec *vec, size_t cap) {
+XErr xvec_reserve_exact(XVec *vec, size_t cap) {
   if (cap < vec->len) {
-    return MEM_ERR_INVALID_SHRINK;
+    return X_ERR_BAD_SHRINK;
   }
-  return xbuf_set_cap(vec->buf, cap);
+  return xbuf_set_cap(&vec->buf, cap);
 }
 
-XMemErr xvec_shrink(XVec *vec) {
-  return xbuf_set_cap(vec->buf, vec->len);
+XErr xvec_shrink(XVec *vec) {
+  return xbuf_set_cap(&vec->buf, vec->len);
 }
 
-void *xvec_get(XVec *vec, size_t idx) {
+XResult xvec_get(XVec *vec, size_t idx) {
   if (idx > vec->len) {
-    return nullptr;
+    return xres_err(X_ERR_BOUNDS);
   }
   return xbuf_access(vec->buf, idx);
 }
 
-XMemErr xvec_set(XVec *vec, size_t idx, void *val) {
+XErr xvec_set(XVec *vec, size_t idx, void *val) {
   if (idx > vec->len) {
-    return MEM_ERR_OOB;
+    return X_ERR_BOUNDS;
   }
-  memcpy(xbuf_access(vec->buf, idx), val, xbuf_alignment(vec->buf));
-  return MEM_OK;
+  // Already checked that idx is in bounds above
+  void *mem = xres_unwrap_unchecked(xbuf_access(vec->buf, idx));
+  memcpy(mem, val, xbuf_alignment(vec->buf));
+  return X_OK;
 }
 
-XMemErr xvec_push(XVec *vec, void *val) {
+XErr xvec_push(XVec *vec, void *val) {
   if (vec->len == xbuf_cap(vec->buf)) {
-    XMemErr err = xbuf_grow(vec->buf);
-    if (err) {
-      return err;
+    XErr res = xbuf_grow(&vec->buf);
+    if (xerr_is_err(res)) {
+      return res;
     }
   }
-  xbuf_access(vec->buf, vec->len);
+  // Don't need to check for success, len is always <= cap
+  void *mem = xres_unwrap_unchecked(xbuf_access(vec->buf, vec->len));
+  memcpy(mem, val, xbuf_alignment(vec->buf));
   vec->len += 1;
+  return X_OK;
 }
 
-void *xvec_pop(XVec *vec) {
+XResult xvec_pop(XVec *vec) {
   if (vec->len == 0) {
-    return nullptr;
+    return xres_err(X_ERR_EMPTY);
   }
+  // len is always <= cap, so len can decrease w/o checking for success first
   vec->len -= 1;
   return xbuf_access(vec->buf, vec->len);
 }

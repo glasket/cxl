@@ -16,7 +16,9 @@
 #pragma once
 #ifndef CXL_VEC_H
 #define CXL_VEC_H
+#include "error.h"
 #include "mem/alloc.h"
+#include "result.h"
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -41,19 +43,19 @@ XVec xvec_new_with_alloc(const size_t cap, const size_t elem_size, const XAlloca
  */
 void xvec_free(XVec *vec);
 
-XMemErr xvec_reserve(XVec *vec, size_t additional);
+XErr xvec_reserve(XVec *vec, size_t additional);
 
-XMemErr xvec_reserve_exact(XVec *vec, size_t cap);
+XErr xvec_reserve_exact(XVec *vec, size_t cap);
 
-XMemErr xvec_shrink(XVec *vec);
+XErr xvec_shrink(XVec *vec);
 
-void *xvec_get(XVec *vec, size_t idx);
+XResult xvec_get(XVec *vec, size_t idx);
 
-XMemErr xvec_set(XVec *vec, size_t idx, void *val);
+XErr xvec_set(XVec *vec, size_t idx, void *val);
 
-XMemErr xvec_push(XVec *vec, void *val);
+XErr xvec_push(XVec *vec, void *val);
 
-void *xvec_pop(XVec *vec);
+XResult xvec_pop(XVec *vec);
 
 size_t xvec_cap(XVec vec);
 
