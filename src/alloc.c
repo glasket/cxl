@@ -76,3 +76,15 @@ void zbfree(void *const ptr, const size_t full_size) {
   memset(ptr, 0, full_size);
   free(ptr);
 }
+
+const XAllocator GlobalAllocator = {
+    .alloc = balloc,
+    .realloc = brealloc,
+    .free = bfree,
+};
+
+const XAllocator ZeroAllocator = {
+    .alloc = zballoc,
+    .realloc = zbrealloc,
+    .free = zbfree,
+};

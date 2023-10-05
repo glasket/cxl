@@ -18,15 +18,6 @@
 #define CXL_MEM_ALLOC_H
 #include <stddef.h>
 
-typedef enum xmem_err {
-  MEM_OK = 0,
-  MEM_ERR_ALLOC,
-  MEM_ERR_OVERFLOW,
-  MEM_ERR_INVALID_SET,
-  MEM_ERR_INVALID_SHRINK,
-  MEM_ERR_OOB
-} XMemErr;
-
 typedef struct XLayout {
   size_t size;
   size_t alignment;
@@ -40,7 +31,7 @@ typedef struct XLayout {
  * @return Pointer to the allocated buffer.
  * @retval nullptr if allocation failed.
  */
-typedef void *(*cxl_mem_allocate)(const XLayout layout, const size_t pad);
+typedef void *(*const cxl_mem_allocate)(const XLayout layout, const size_t pad);
 
 /**
  * @brief Reallocates a buffer with the specified layout.
@@ -52,7 +43,7 @@ typedef void *(*cxl_mem_allocate)(const XLayout layout, const size_t pad);
  * @return Pointer to the reallocated buffer.
  * @retval nullptr if reallocation failed.
  */
-typedef void *(*cxl_mem_reallocate)(
+typedef void *(*const cxl_mem_reallocate)(
     void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad
 );
 
@@ -62,7 +53,7 @@ typedef void *(*cxl_mem_reallocate)(
  * @param[in] buf Pointer to the buffer to deallocate.
  * @param[in] full_size The full size of the buffer. For zeroing.
  */
-typedef void (*cxl_mem_deallocate)(void *const buf, const size_t full_size);
+typedef void (*const cxl_mem_deallocate)(void *const buf, const size_t full_size);
 
 typedef struct XAllocator {
   cxl_mem_allocate alloc;
@@ -89,17 +80,9 @@ void *zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_lay
 void bfree(void *const ptr, const size_t full_size);
 void zbfree(void *const ptr, const size_t full_size);
 
-const XAllocator GlobalAllocator = {
-    .alloc = balloc,
-    .realloc = brealloc,
-    .free = bfree,
-};
+extern const XAllocator GlobalAllocator;
 
 // Also does overflow checks
-const XAllocator ZeroAllocator = {
-    .alloc = zballoc,
-    .realloc = zbrealloc,
-    .free = zbfree,
-};
+extern const XAllocator ZeroAllocator;
 
 #endif
