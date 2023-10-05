@@ -1,6 +1,6 @@
 CompileFlags:
   Remove: [-xobjective-c++-header]
-  Add: [-Wall, -Wextra, --std=c2x, -pedantic, -ferror-limit=128, -xc, -I../include/, -fstrict-flex-arrays=2]
+  Add: [-Wall, -Wextra, -Wno-fixed-enum-extension, --std=c2x, -pedantic, -ferror-limit=128, -xc, -I../include/, -fstrict-flex-arrays=2]
   Compiler: clang
 
 Index:

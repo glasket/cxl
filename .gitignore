@@ -7,3 +7,6 @@ docs/
 
 spec/*
 !spec/spec.tex
+
+*.out
+*.o
