@@ -5,3 +5,16 @@ CompileFlags:
 
 Index:
   StandardLibrary: No
+
+Diagnostics:
+  UnusedIncludes: Strict
+
+---
+
+If:
+  PathMatch: '.*\.h'
+
+CompileFlags:
+  Remove: [-xc]
+  Add: [-xc-header]
+  Compiler: clang
