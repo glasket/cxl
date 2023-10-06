@@ -16,9 +16,9 @@
 #pragma once
 #ifndef CXL_MEM_BUF_H
 #define CXL_MEM_BUF_H
-#include "../error.h"
-#include "../result.h"
-#include "alloc.h"
+#include <cxl/error.h>
+#include <cxl/mem/alloc.h>
+#include <cxl/result.h>
 #include <stdlib.h>
 
 /**

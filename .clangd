@@ -1,20 +1,7 @@
-CompileFlags:
-  Remove: [-xobjective-c++-header]
-  Add: [-Wall, -Wextra, -Wno-fixed-enum-extension, --std=c2x, -pedantic, -ferror-limit=128, -xc, -I../include/, -fstrict-flex-arrays=2]
-  Compiler: clang
-
 Index:
   StandardLibrary: No
 
 Diagnostics:
   UnusedIncludes: Strict
-
----
-
-If:
-  PathMatch: '.*\.h'
-
-CompileFlags:
-  Remove: [-xc]
-  Add: [-xc-header]
-  Compiler: clang
+  ClangTidy:
+    Add: modernize*

@@ -1,5 +1,43 @@
+IMPLS = $(shell find src -name '*.c')
+OBJS = $(IMPLS:src/%.c=build/o/%.o)
+HEADERS = $(shell find include/cxl/ -name '*.h')
+H_DIRS = $(patsubst include/cxl/%,build/gch/%,$(shell find include/cxl/ -type d))
+O_DIRS = $(patsubst src/%,build/o/%,$(shell find src/ -type d))
+PCH = $(HEADERS:include/cxl/%.h=build/gch/%.h.gch)
 
-.PHONY: docs
+CC = clang
+CFLAGS = -g --std=c2x -Iinclude -Wall -pedantic
+
+.PHONY: docs all objects headers comp
+
+print:
+	@echo $(IMPLS)
+	@echo $(OBJS)
+	@echo $(H_DIRS)
+	@echo $(O_DIRS)
+	@echo $(HEADERS)
+	@echo $(PCH)
+
+comp: headers objects
+
+headers: $(H_DIRS) $(PCH) 
+
+objects: $(O_DIRS) $(OBJS)
+
+$(PCH): build/gch/%.h.gch: include/cxl/%.h
+	$(CC) -xc-header $(CFLAGS) $< -o $@
+
+build/gch:
+	mkdir -p build/gch
+
+$(OBJS): build/o/%.o: src/%.c
+	$(CC) -xc $(CFLAGS) -c $< -o $@
+
+$(H_DIRS):
+	mkdir -p $@
+
+$(O_DIRS):
+	mkdir -p $@
 
 docs:
 	doxygen Doxyfile

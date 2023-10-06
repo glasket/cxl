@@ -18,11 +18,6 @@
 #include <cxl/vec.h>
 #include <string.h>
 
-struct XVec {
-  XBuffer *buf;
-  size_t len;
-};
-
 static XVec internal_vec_new(const size_t cap, const size_t elem_size, const XAllocator *const alloc) {
   return (XVec){.buf = xres_unwrap(xbuf_new((XLayout){.size = cap, .alignment = elem_size}, alloc)), .len = 0};
 }

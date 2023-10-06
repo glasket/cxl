@@ -16,15 +16,16 @@
 #pragma once
 #ifndef CXL_VEC_H
 #define CXL_VEC_H
-#include "error.h"
-#include "mem/alloc.h"
-#include "result.h"
+#include <cxl/error.h>
+#include <cxl/mem/buf.h>
+#include <cxl/result.h>
 #include <stddef.h>
 #include <stdlib.h>
 
-typedef struct XVec XVec;
-
-typedef struct XSlice XSlice;
+typedef struct XVec {
+  XBuffer *buf;
+  size_t len;
+} XVec;
 
 /**
  * @brief Create a new vector.
