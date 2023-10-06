@@ -52,7 +52,7 @@ void *zballoc(const XLayout layout, const size_t pad) {
   return calloc(1, total);
 }
 
-void *brealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad) {
+void *brealloc(void *const ptr, [[gnu::unused]] const XLayout old_layout, const XLayout new_layout, const size_t pad) {
   size_t total = layout_size(new_layout, pad);
   if (total == 0) {
     return nullptr;
@@ -82,7 +82,7 @@ void *zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_lay
   return tmp;
 }
 
-void bfree(void *const ptr, const size_t full_size) {
+void bfree(void *const ptr, [[gnu::unused]] const size_t full_size) {
   free(ptr);
 }
 
