@@ -12,3 +12,7 @@ spec/*
 *.o
 
 .cache
+
+**/spike*
+.ccls-cache
+.cache

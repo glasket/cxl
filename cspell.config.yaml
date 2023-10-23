@@ -1,0 +1,19 @@
+version: "0.2"
+ignorePaths: [
+  cspell.config.yaml
+]
+dictionaryDefinitions: []
+dictionaries: []
+words: [
+  glasket,
+  sigmon,
+  xbuf,
+  xvec,
+  xresult
+]
+flagWords: [
+  hte,
+  ot
+]
+ignoreWords: []
+import: []

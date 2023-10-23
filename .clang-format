@@ -5,3 +5,4 @@ BreakBeforeBraces: Attach
 ColumnLimit: 120
 IndentWidth: 2
 UseTab: Never
+AlignEscapedNewlines: DontAlign

@@ -5,10 +5,10 @@ H_DIRS = $(patsubst include/cxl/%,build/gch/%,$(shell find include/cxl/ -type d)
 O_DIRS = $(patsubst src/%,build/o/%,$(shell find src/ -type d))
 PCH = $(HEADERS:include/cxl/%.h=build/gch/%.h.gch)
 
-CC = clang
+CC = gcc
 CFLAGS = -g --std=c2x -Iinclude -Wall -pedantic
 
-.PHONY: docs all objects headers comp
+.PHONY: docs objects headers comp bear
 
 print:
 	@echo $(IMPLS)
@@ -17,6 +17,10 @@ print:
 	@echo $(O_DIRS)
 	@echo $(HEADERS)
 	@echo $(PCH)
+
+bear: CFLAGS = -g --std=c2x -Iinclude -Wall -pedantic -fsyntax-only -Wno-gnu-auto-type -Wno-gnu-empty-initializer
+bear:
+	bear | make comp
 
 comp: headers objects
 

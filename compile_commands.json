@@ -1,7 +1,7 @@
 [
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-c",
       "-xc-header",
       "-g",
@@ -9,6 +9,72 @@
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/mem/alloc.h.gch",
+      "include/cxl/mem/alloc.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/mem/alloc.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/mem/alloc.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/mem/buf.h.gch",
+      "include/cxl/mem/buf.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/mem/buf.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/mem/buf.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/mem/ptr.h.gch",
+      "include/cxl/mem/ptr.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/mem/ptr.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/mem/ptr.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-o",
       "build/gch/string.h.gch",
       "include/cxl/string.h"
@@ -19,7 +85,7 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-c",
       "-xc-header",
       "-g",
@@ -27,6 +93,9 @@
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-o",
       "build/gch/vec.h.gch",
       "include/cxl/vec.h"
@@ -37,7 +106,7 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-c",
       "-xc-header",
       "-g",
@@ -45,6 +114,9 @@
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-o",
       "build/gch/error.h.gch",
       "include/cxl/error.h"
@@ -55,7 +127,7 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-c",
       "-xc-header",
       "-g",
@@ -63,6 +135,9 @@
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-o",
       "build/gch/result.h.gch",
       "include/cxl/result.h"
@@ -73,7 +148,7 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-c",
       "-xc-header",
       "-g",
@@ -81,6 +156,51 @@
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/gen/result.h.gch",
+      "include/cxl/gen/result.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/gen/result.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/gen/result.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/gen/option.h.gch",
+      "include/cxl/gen/option.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/gen/option.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/gen/option.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-o",
       "build/gch/option.h.gch",
       "include/cxl/option.h"
@@ -91,13 +211,37 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
+      "-c",
+      "-xc-header",
+      "-g",
+      "--std=c2x",
+      "-Iinclude",
+      "-Wall",
+      "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
+      "-o",
+      "build/gch/type.h.gch",
+      "include/cxl/type.h"
+    ],
+    "directory": "/home/glasket/Projects/c/cxl",
+    "file": "/home/glasket/Projects/c/cxl/include/cxl/type.h",
+    "output": "/home/glasket/Projects/c/cxl/build/gch/type.h.gch"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/alloc.o",
@@ -109,13 +253,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/buf.o",
@@ -127,13 +274,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/string.o",
@@ -145,13 +295,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/vec.o",
@@ -163,13 +316,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/result.o",
@@ -181,13 +337,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/option.o",
@@ -199,13 +358,16 @@
   },
   {
     "arguments": [
-      "/usr/bin/clang",
+      "/usr/bin/gcc",
       "-xc",
       "-g",
       "--std=c2x",
       "-Iinclude",
       "-Wall",
       "-pedantic",
+      "-fsyntax-only",
+      "-Wno-gnu-auto-type",
+      "-Wno-gnu-empty-initializer",
       "-c",
       "-o",
       "build/o/error.o",
