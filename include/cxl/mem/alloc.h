@@ -16,11 +16,19 @@
 #pragma once
 #ifndef CXL_MEM_ALLOC_H
 #define CXL_MEM_ALLOC_H
+
+#include <cxl/result.h>
+#include <cxl/type.h>
 #include <stddef.h>
 
+#define XLAYOUT_INIT(layout_size, layout_alignment) \
+  (XLayout) { \
+    .size = layout_size, .alignment = layout_alignment \
+  }
+
 typedef struct XLayout {
-  size_t size;
-  size_t alignment;
+  usize size;
+  usize alignment;
 } XLayout;
 
 /**
@@ -31,7 +39,7 @@ typedef struct XLayout {
  * @return Pointer to the allocated buffer.
  * @retval nullptr if allocation failed.
  */
-typedef void *(*const cxl_mem_allocate)(const XLayout layout, const size_t pad);
+typedef XResult (*const cxl_mem_allocate)(const XLayout layout, const usize pad);
 
 /**
  * @brief Reallocates a buffer with the specified layout.
@@ -43,8 +51,8 @@ typedef void *(*const cxl_mem_allocate)(const XLayout layout, const size_t pad);
  * @return Pointer to the reallocated buffer.
  * @retval nullptr if reallocation failed.
  */
-typedef void *(*const cxl_mem_reallocate)(
-    void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad
+typedef XResult (*const cxl_mem_reallocate)(
+    void *const ptr, const XLayout old_layout, const XLayout new_layout, const usize pad
 );
 
 /**
@@ -53,7 +61,7 @@ typedef void *(*const cxl_mem_reallocate)(
  * @param[in] buf Pointer to the buffer to deallocate.
  * @param[in] full_size The full size of the buffer. For zeroing.
  */
-typedef void (*const cxl_mem_deallocate)(void *const buf, const size_t full_size);
+typedef void (*const cxl_mem_deallocate)(void *const buf, const usize full_size);
 
 typedef struct XAllocator {
   cxl_mem_allocate alloc;
@@ -71,14 +79,14 @@ typedef struct XAllocator {
 // (NodeList is a planned memory representation for non-contiguous allocators, like
 // linked block arenas.)
 
-void *balloc(const XLayout layout, const size_t pad);
-void *zballoc(const XLayout layout, const size_t pad);
+XResult balloc(const XLayout layout, const usize pad);
+XResult zballoc(const XLayout layout, const usize pad);
 
-void *brealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad);
-void *zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const size_t pad);
+XResult brealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const usize pad);
+XResult zbrealloc(void *const ptr, const XLayout old_layout, const XLayout new_layout, const usize pad);
 
-void bfree(void *const ptr, const size_t full_size);
-void zbfree(void *const ptr, const size_t full_size);
+void bfree(void *const ptr, const usize full_size);
+void zbfree(void *const ptr, const usize full_size);
 
 extern const XAllocator GlobalAllocator;
 
