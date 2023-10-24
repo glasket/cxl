@@ -17,9 +17,13 @@
 #ifndef CXL_MEM_BUF_H
 #define CXL_MEM_BUF_H
 #include <cxl/error.h>
+#include <cxl/gen/option.h>
 #include <cxl/mem/alloc.h>
 #include <cxl/result.h>
+#include <cxl/type.h>
 #include <stdlib.h>
+
+CXL_GEN_OPTION(u8 *, u8_ptr)
 
 /**
  * @brief Buffer type that represents a contiguous block of memory.
@@ -38,24 +42,27 @@ XResult xbuf_new(const XLayout layout, const XAllocator *const alloc);
  */
 void xbuf_free(XBuffer *buf);
 
-XErr xbuf_grow(XBuffer **buf);
+XResult xbuf_grow(XBuffer *buf);
 
-XErr xbuf_grow_by(XBuffer **buf, const size_t increase); // Equivalent to RawVec.Reserve
+XResult xbuf_grow_until(XBuffer *buf, const usize cap);
 
-XErr xbuf_set_cap(XBuffer **buf, const size_t cap);
+XResult xbuf_grow_by(XBuffer *buf, const usize increase); // Equivalent to RawVec.Reserve
 
-size_t xbuf_cap(const XBuffer *const buf);
+XResult xbuf_set_cap(XBuffer *buf, const usize cap);
 
-size_t xbuf_alignment(const XBuffer *const buf);
+usize xbuf_cap(const XBuffer *const buf);
+
+usize xbuf_alignment(const XBuffer *const buf);
 
 // TODO Maybe allow buf_realign?
 
-XResult xbuf_access(XBuffer *const buf, const size_t offset);
+XResult xbuf_access(XBuffer *const buf, const usize offset);
 
 // Converts an existing pointer into a buffer, copies the data.
 XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc);
 
-// Returns the pointer to the buffer's data. nullptr if the buffer is empty.
-XOption xbuf_ptr(XBuffer *const buf);
+XOption_u8_ptr xbuf_ptr(XBuffer *const buf);
+
+bool xbuf_check_alignment(const XBuffer *const buf, const XBuffer *const other);
 
 #endif

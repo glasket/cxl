@@ -16,7 +16,9 @@
 #include "ckdint.h"
 #include "common.h"
 #include "cxl/mem/alloc.h"
+#include "cxl/result.h"
 #include <cxl/mem/buf.h>
+#include <cxl/option.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -25,34 +27,39 @@
 struct XBuffer {
   XAllocator *alloc;
   XLayout layout;
-  uint8_t mem[];
+  u8 mem[];
 };
 
-static XErr internal_xbuf_set_cap(XBuffer **buf, const size_t cap) {
-  if (cap == (*buf)->layout.size) {
-    return X_OK; // Setting size to what it already is
+static XResult internal_xbuf_set_cap(XBuffer *buf, const usize cap) {
+  if (cap == buf->layout.size) {
+    return xres_ok(buf); // Setting size to what it already is
   }
 
-  void *new_buffer = (*buf)->alloc->realloc(
-      *buf, (*buf)->layout, (XLayout){.alignment = (*buf)->layout.alignment, .size = cap}, sizeof(XBuffer)
+  XResult res = buf->alloc->realloc(
+      buf, buf->layout, (XLayout){.alignment = buf->layout.alignment, .size = cap}, sizeof(XBuffer)
   );
+  if (res.is_err) {
+    return res;
+  }
+  XBuffer *new_buffer = res.value.ok;
   if (new_buffer == nullptr) {
-    return X_ERR_ALLOC;
+    return xres_err(X_ERR_ALLOC);
   }
 
-  *buf = new_buffer;
-  (*buf)->layout.size = cap;
-  return X_OK;
+  new_buffer->layout = buf->layout;
+  new_buffer->alloc = buf->alloc;
+  return xres_ok(new_buffer);
 }
 
 XResult xbuf_new(const XLayout layout, const XAllocator *const alloc) {
   if (layout.alignment == 0) {
     return xres_err(X_ERR_BAD_ALIGNMENT);
   }
-  XBuffer *buf = alloc->alloc(layout, sizeof(XBuffer));
-  if (buf == nullptr) {
-    return xres_err(X_ERR_ALLOC);
+  XResult res = alloc->alloc(layout, sizeof(XBuffer));
+  if (res.is_err) {
+    return res;
   }
+  XBuffer *buf = res.value.ok;
 
   buf->layout = layout;
   // Casting to init the allocator pointer
@@ -65,36 +72,49 @@ void xbuf_free(XBuffer *buf) {
   buf = nullptr;
 }
 
-XErr xbuf_grow(XBuffer **buf) {
-  return xbuf_grow_by(buf, (*buf)->layout.size == 0 ? 1 : (*buf)->layout.size);
+XResult xbuf_grow(XBuffer *buf) {
+  return xbuf_grow_by(buf, buf->layout.size == 0 ? 1 : buf->layout.size);
 }
 
-XErr xbuf_grow_by(XBuffer **buf, const size_t increase) {
-  if (increase == 0) {
-    return X_OK; // Grow by nothing is fine
+XResult xbuf_grow_until(XBuffer *buf, const usize cap) {
+  usize new_size = buf->layout.size;
+  if (cap <= new_size) {
+    return xres_ok(buf); // Already big enough
   }
 
-  size_t new_cap = 0;
-  if (ckd_add(&new_cap, (*buf)->layout.size, increase)) {
-    return X_ERR_OVERFLOW;
+  while (new_size < cap) { // TODO Better algorithm
+    new_size *= 2;
+  }
+
+  return xbuf_grow_by(buf, cap - buf->layout.size);
+}
+
+XResult xbuf_grow_by(XBuffer *buf, const usize increase) {
+  if (increase == 0) {
+    return xres_ok(buf); // Grow by nothing is fine
+  }
+
+  usize new_cap = 0;
+  if (ckd_add(&new_cap, buf->layout.size, increase)) {
+    return xres_err(X_ERR_OVERFLOW);
   }
 
   return xbuf_set_cap(buf, new_cap);
 }
 
-XErr xbuf_set_cap(XBuffer **buf, const size_t cap) {
+XResult xbuf_set_cap(XBuffer *buf, const usize cap) {
   return internal_xbuf_set_cap(buf, cap);
 }
 
-size_t xbuf_cap(const XBuffer *const buf) {
+usize xbuf_cap(const XBuffer *const buf) {
   return buf->layout.size;
 }
 
-size_t xbuf_alignment(const XBuffer *const buf) {
+usize xbuf_alignment(const XBuffer *const buf) {
   return buf->layout.alignment;
 }
 
-XResult xbuf_access(XBuffer *const buf, const size_t offset) {
+XResult xbuf_access(XBuffer *const buf, const usize offset) {
   if (offset >= buf->layout.size) {
     return xres_err(X_ERR_BOUNDS);
   }
@@ -106,14 +126,18 @@ XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *c
   if (res.is_err) {
     return res;
   }
-  XBuffer *buf = res.res.ptr;
+  XBuffer *buf = res.value.ok;
   memcpy(buf->mem, ptr, layout.size * layout.alignment);
   return xres_ok(buf);
 }
 
-XOption xbuf_ptr(XBuffer *const buf) {
+XOption_u8_ptr xbuf_ptr(XBuffer *const buf) {
   if (buf == nullptr || buf->layout.size == 0) {
-    return xopt_none();
+    return xopt_none_u8_ptr();
   }
-  return xopt_some(buf->mem);
+  return xopt_some_u8_ptr(buf->mem);
+}
+
+bool xbuf_check_alignment(const XBuffer *const buf, const XBuffer *const other) {
+  return buf->layout.alignment == other->layout.alignment;
 }
