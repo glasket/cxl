@@ -1,3 +1,15 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+/**
+ * @author Christian Sigmon 'Glasket' <cws@glasket.com>
+ * @date 2023-
+ * @copyright MPL-2.0
+ * @version 0.1.0
+ */
 
 #pragma once
 #ifndef CXL_GEN_RESULT_H
