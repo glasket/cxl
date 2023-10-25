@@ -14,19 +14,20 @@
  */
 
 #include "common.h"
+#include <cxl/error.h>
 #include <cxl/mem/buf.h>
 #include <cxl/vec.h>
 #include <string.h>
 
-static XVec internal_vec_new(const size_t cap, const size_t elem_size, const XAllocator *const alloc) {
+static XVec internal_vec_new(const usize cap, const usize elem_size, const XAllocator *const alloc) {
   return (XVec){.buf = xres_unwrap(xbuf_new((XLayout){.size = cap, .alignment = elem_size}, alloc)), .len = 0};
 }
 
-XVec xvec_new(const size_t cap, const size_t elem_size) {
+XVec xvec_new(const usize cap, const usize elem_size) {
   return internal_vec_new(cap, elem_size, &GlobalAllocator);
 }
 
-XVec xvec_new_with_alloc(const size_t cap, const size_t elem_size, const XAllocator *const alloc) {
+XVec xvec_new_with_alloc(const usize cap, const usize elem_size, const XAllocator *const alloc) {
   return internal_vec_new(cap, elem_size, alloc);
 }
 
@@ -35,29 +36,39 @@ void vec_free(XVec vec) {
   vec.buf = nullptr;
 }
 
-XErr xvec_reserve(XVec *vec, size_t additional) {
-  return xbuf_grow_by(&vec->buf, additional);
+XErr xvec_reserve(XVec *const vec, const usize additional) {
+  XResult res = xbuf_grow_by(vec->buf, additional);
+  if (res.is_err) {
+    return res.value.err;
+  }
+  vec->buf = res.value.ok;
+  return X_OK;
 }
 
-XErr xvec_reserve_exact(XVec *vec, size_t cap) {
+XErr xvec_reserve_exact(XVec *const vec, const usize cap) {
   if (cap < vec->len) {
     return X_ERR_BAD_SHRINK;
   }
-  return xbuf_set_cap(&vec->buf, cap);
+  XResult res = xbuf_set_cap(vec->buf, cap);
+  if (res.is_err) {
+    return res.value.err;
+  }
+  vec->buf = res.value.ok;
+  return X_OK;
 }
 
-XErr xvec_shrink(XVec *vec) {
-  return xbuf_set_cap(&vec->buf, vec->len);
+XErr xvec_shrink(XVec *const vec) {
+  return xvec_reserve_exact(vec, vec->len);
 }
 
-XResult xvec_get(XVec *vec, size_t idx) {
+XResult xvec_get(const XVec *const vec, usize idx) {
   if (idx > vec->len) {
     return xres_err(X_ERR_BOUNDS);
   }
   return xbuf_access(vec->buf, idx);
 }
 
-XErr xvec_set(XVec *vec, size_t idx, void *val) {
+XErr xvec_set(const XVec *const vec, const usize idx, const void *const val) {
   if (idx > vec->len) {
     return X_ERR_BOUNDS;
   }
@@ -67,11 +78,11 @@ XErr xvec_set(XVec *vec, size_t idx, void *val) {
   return X_OK;
 }
 
-XErr xvec_push(XVec *vec, void *val) {
+XErr xvec_push(XVec *const vec, const void *const val) {
   if (vec->len == xbuf_cap(vec->buf)) {
-    XErr res = xbuf_grow(&vec->buf);
-    if (xerr_is_err(res)) {
-      return res;
+    XResult res = xbuf_grow(vec->buf);
+    if (res.is_err) {
+      return res.value.err;
     }
   }
   // Don't need to check for success, len is always <= cap
@@ -81,7 +92,7 @@ XErr xvec_push(XVec *vec, void *val) {
   return X_OK;
 }
 
-XResult xvec_pop(XVec *vec) {
+XResult xvec_pop(XVec *const vec) {
   if (vec->len == 0) {
     return xres_err(X_ERR_EMPTY);
   }
@@ -90,10 +101,29 @@ XResult xvec_pop(XVec *vec) {
   return xbuf_access(vec->buf, vec->len);
 }
 
-size_t xvec_cap(XVec vec) {
-  return xbuf_cap(vec.buf);
+static XErr internal_xvec_check_vec_align(const XVec vec, const XVec other) {
+  if (xbuf_check_alignment(vec.buf, other.buf)) {
+    return X_ERR_MISMATCHED_ALIGNMENT;
+  }
+  return X_OK;
 }
 
-size_t xvec_len(XVec vec) {
-  return vec.len;
+XErr xvec_append(XVec *const vec, const XVec other) {
+  XErr err = internal_xvec_check_vec_align(*vec, other);
+  if (xerr_is_err(err)) {
+    return err;
+  }
+  return xvec_append_raw(vec, xopt_unwrap_u8_ptr(xbuf_ptr(other.buf)), other.len);
+}
+
+// Assumes that the alignment of the vec elements is the same as the alignment of the data
+XErr xvec_append_raw(XVec *const vec, const void *const data, const usize data_elem_count) {
+  xbuf_grow_until(vec->buf, vec->len + data_elem_count);
+  memcpy(xopt_unwrap_u8_ptr(xbuf_ptr(vec->buf)) + vec->len, data, data_elem_count * xbuf_alignment(vec->buf));
+  vec->len += data_elem_count;
+  return X_OK;
+}
+
+usize xvec_cap(const XVec vec) {
+  return xbuf_cap(vec.buf);
 }

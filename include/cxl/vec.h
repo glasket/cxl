@@ -22,9 +22,15 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#define XVEC_INIT(vec_type, vec_cap) \
+  ((XVec){.buf = xres_unwrap(xbuf_new(XLAYOUT_INIT(vec_cap, sizeof(vec_type)), &GlobalAllocator))})
+
+#define XVEC_INIT_ALLOC(vec_type, vec_cap, vec_allocator) \
+  ((XVec){.buf = xres_unwrap(xbuf_new(XLAYOUT_INIT(vec_cap, sizeof(vec_type)), vec_allocator))})
+
 typedef struct XVec {
   XBuffer *buf;
-  size_t len;
+  usize len;
 } XVec;
 
 /**
@@ -34,9 +40,9 @@ typedef struct XVec {
  * @return a pointer to the new vector.
  * @retval nullptr if memory allocation failed.
  */
-XVec xvec_new(const size_t cap, const size_t elem_size);
+XVec xvec_new(const usize cap, const usize elem_size);
 
-XVec xvec_new_with_alloc(const size_t cap, const size_t elem_size, const XAllocator *const alloc);
+XVec xvec_new_with_alloc(const usize cap, const usize elem_size, const XAllocator *const alloc);
 
 /**
  * @brief Free a vector.
@@ -44,22 +50,24 @@ XVec xvec_new_with_alloc(const size_t cap, const size_t elem_size, const XAlloca
  */
 void xvec_free(XVec *vec);
 
-XErr xvec_reserve(XVec *vec, size_t additional);
+XErr xvec_reserve(XVec *const vec, const usize additional);
 
-XErr xvec_reserve_exact(XVec *vec, size_t cap);
+XErr xvec_reserve_exact(XVec *const vec, const usize cap);
 
-XErr xvec_shrink(XVec *vec);
+XErr xvec_shrink(XVec *const vec);
 
-XResult xvec_get(XVec *vec, size_t idx);
+XResult xvec_get(const XVec *const vec, const usize idx);
 
-XErr xvec_set(XVec *vec, size_t idx, void *val);
+XErr xvec_set(const XVec *const vec, const usize idx, const void *const val);
 
-XErr xvec_push(XVec *vec, void *val);
+XErr xvec_push(XVec *const vec, const void *const val);
 
-XResult xvec_pop(XVec *vec);
+XResult xvec_pop(XVec *const vec);
 
-size_t xvec_cap(XVec vec);
+XErr xvec_append(XVec *const vec, const XVec other);
 
-size_t xvec_len(XVec vec);
+XErr xvec_append_raw(XVec *const vec, const void *const data, const usize data_elem_count);
+
+usize xvec_cap(const XVec vec);
 
 #endif
