@@ -10,9 +10,11 @@ spec/*
 
 *.out
 *.o
+*.a
 
 .cache
 
 **/spike*
 .ccls-cache
 .cache
+compile_commands.json
