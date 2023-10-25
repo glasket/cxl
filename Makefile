@@ -18,7 +18,7 @@ print:
 	@echo $(HEADERS)
 	@echo $(PCH)
 
-bear: CFLAGS = -g --std=c2x -DCXL_TYPE=int -DCXL_SUFFIX=int -Iinclude -Wall -pedantic -fsyntax-only -Wno-gnu-auto-type -Wno-gnu-empty-initializer -Wno-pp-hash-error -Wno-macro-redefined
+bear: CFLAGS = -g --std=c2x -DCXL_TYPE=int -DCXL_SUFFIX=int -Iinclude -Wall -pedantic -fsyntax-only -Wno-gnu-auto-type -Wno-gnu-empty-initializer -Wno-macro-redefined
 bear:
 	bear -- make CFLAGS='$(CFLAGS)' -B comp
 
