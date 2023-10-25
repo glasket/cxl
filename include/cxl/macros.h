@@ -23,3 +23,6 @@
   (TYPE) { \
   }
 #endif
+
+#define CAT(x, y) x##y
+#define CAT_H(x, y) CAT(x, y)

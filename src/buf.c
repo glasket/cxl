@@ -15,14 +15,20 @@
 
 #include "ckdint.h"
 #include "common.h"
-#include "cxl/mem/alloc.h"
-#include "cxl/result.h"
+#include <cxl/mem/alloc.h>
 #include <cxl/mem/buf.h>
 #include <cxl/option.h>
+#include <cxl/result.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <stdio.h>
+
+#define CXL_TYPE u8 *
+#define CXL_SUFFIX u8_ptr
+#include <cxl/gen/option.h>
+#undef CXL_TYPE
+#undef CXL_SUFFIX
 
 struct XBuffer {
   XAllocator *alloc;

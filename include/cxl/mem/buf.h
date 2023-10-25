@@ -17,13 +17,18 @@
 #ifndef CXL_MEM_BUF_H
 #define CXL_MEM_BUF_H
 #include <cxl/error.h>
-#include <cxl/gen/option.h>
 #include <cxl/mem/alloc.h>
 #include <cxl/result.h>
 #include <cxl/type.h>
 #include <stdlib.h>
 
-CXL_GEN_OPTION(u8 *, u8_ptr)
+#define CXL_TYPE u8 *
+#define CXL_SUFFIX u8_ptr
+#define CXL_DECL_ONLY 1
+#include <cxl/gen/option.h>
+#undef CXL_TYPE
+#undef CXL_SUFFIX
+#undef CXL_DECL_ONLY
 
 /**
  * @brief Buffer type that represents a contiguous block of memory.

@@ -16,14 +16,19 @@
 #include "auto.h"
 #include "ckdint.h"
 #include <cxl/error.h>
-#include <cxl/gen/result.h>
 #include <cxl/mem/alloc.h>
 #include <cxl/type.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-CXL_GEN_RESULT(usize, usize)
+#define CXL_TYPE usize
+#define CXL_SUFFIX usize
+#define CXL_INCL_STRUCT 1
+#include <cxl/gen/result.h>
+#undef CXL_INCL_STRUCT
+#undef CXL_TYPE
+#undef CXL_SUFFIX
 
 static XResult_usize layout_size(const XLayout layout, const usize pad) {
   if (layout.size == 0 || layout.alignment == 0) {
