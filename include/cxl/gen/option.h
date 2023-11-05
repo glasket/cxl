@@ -18,19 +18,25 @@
 #include <cxl/macros.h>
 #endif
 
-#if defined(CXL_TYPE) && defined(CXL_SUFFIX)
+#if defined(CXL_TYPE)
 
 #if defined(CXL_DECL_ONLY) && !defined(CXL_INCL_STRUCT) || defined(CXL_INCL_STRUCT)
 // We include on declaration only because Options can be statically allocated.
 #define XOPT_INCL_STRUCT 1
 #endif
 
-#define XOPT_NAME CAT_H(XOption_, CXL_SUFFIX)
-#define XOPT_NONE CAT_H(xopt_none_, CXL_SUFFIX)
-#define XOPT_SOME CAT_H(xopt_some_, CXL_SUFFIX)
-#define XOPT_UNWRAP CAT_H(xopt_unwrap_, CXL_SUFFIX)
-#define XOPT_UNWRAP_OR CAT_H(xopt_unwrap_or_, CXL_SUFFIX)
-#define XOPT_UNWRAP_OR_ELSE CAT_H(xopt_unwrap_or_else_, CXL_SUFFIX)
+#ifndef CXL_SUFFIX
+#define XOPT_SUFFIX
+#else
+#define XOPT_SUFFIX CAT_H(_, CXL_SUFFIX)
+#endif
+
+#define XOPT_NAME CAT_H(XOption, XOPT_SUFFIX)
+#define XOPT_NONE CAT_H(xopt_none, XOPT_SUFFIX)
+#define XOPT_SOME CAT_H(xopt_some, XOPT_SUFFIX)
+#define XOPT_UNWRAP CAT_H(xopt_unwrap, XOPT_SUFFIX)
+#define XOPT_UNWRAP_OR CAT_H(xopt_unwrap_or, XOPT_SUFFIX)
+#define XOPT_UNWRAP_OR_ELSE CAT_H(xopt_unwrap_or_else, XOPT_SUFFIX)
 
 #ifdef XOPT_INCL_STRUCT
 typedef struct XOPT_NAME {
@@ -92,8 +98,9 @@ CXL_TYPE XOPT_UNWRAP_OR_ELSE(XOPT_NAME opt, CXL_TYPE (*const f)(void)) {
 #undef CXL_INCL_STRUCT
 #undef CXL_TYPE
 #undef CXL_SUFFIX
+#undef XOPT_SUFFIX
 #undef CXL_DECL_ONLY
 
 #else
-#error "Must define CXL_TYPE and CXL_SUFFIX before including this file."
+#error "Must define CXL_TYPE before including this file."
 #endif

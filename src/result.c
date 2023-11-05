@@ -16,36 +16,5 @@
 #include <assert.h>
 #include <cxl/result.h>
 
-XResult xres_ok(void *ptr) {
-  return (XResult){.value.ok = ptr, .is_err = false, .is_ok = true};
-}
-
-XResult xres_err(uintptr_t err) {
-  return (XResult){.value.err = err, .is_err = true, .is_ok = false};
-}
-
-void *xres_unwrap(XResult res) {
-  assert(res.is_ok);
-  if (res.is_ok) {
-    return res.value.ok;
-  }
-  return nullptr;
-}
-
-void *xres_unwrap_or(XResult res, void *def) {
-  if (res.is_ok) {
-    return res.value.ok;
-  }
-  return def;
-}
-
-void *xres_unwrap_or_else(XResult res, void *(*or_else)(uintptr_t err)) {
-  if (res.is_ok) {
-    return res.value.ok;
-  }
-  return or_else(res.value.err);
-}
-
-void *xres_unwrap_unchecked(XResult res) {
-  return res.value.ok;
-}
+#define CXL_TYPE void *
+#include <cxl/gen/result.h>

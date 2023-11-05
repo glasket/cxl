@@ -18,20 +18,26 @@
 #include <stdint.h>
 #endif
 
-#if defined(CXL_TYPE) && defined(CXL_SUFFIX)
+#if defined(CXL_TYPE)
 
 #if defined(CXL_DECL_ONLY) && !defined(CXL_INCL_STRUCT) || defined(CXL_INCL_STRUCT)
 // We include on declaration only because Results can be statically allocated.
 #define XRES_INCL_STRUCT 1
 #endif
 
-#define XRES_NAME CAT_H(XResult_, CXL_SUFFIX)
-#define XRES_OK CAT_H(xres_ok_, CXL_SUFFIX)
-#define XRES_ERR CAT_H(xres_err_, CXL_SUFFIX)
-#define XRES_UNWRAP CAT_H(xres_unwrap_, CXL_SUFFIX)
-#define XRES_UNWRAP_OR CAT_H(xres_unwrap_or_, CXL_SUFFIX)
-#define XRES_UNWRAP_OR_ELSE CAT_H(xres_unwrap_or_else_, CXL_SUFFIX)
-#define XRES_UNWRAP_UNCHECKED CAT_H(xres_unwrap_unchecked_, CXL_SUFFIX)
+#ifndef CXL_SUFFIX
+#define XRES_SUFFIX
+#else
+#define XRES_SUFFIX CAT_H(_, CXL_SUFFIX)
+#endif
+
+#define XRES_NAME CAT_H(XResult, XRES_SUFFIX)
+#define XRES_OK CAT_H(xres_ok, XRES_SUFFIX)
+#define XRES_ERR CAT_H(xres_err, XRES_SUFFIX)
+#define XRES_UNWRAP CAT_H(xres_unwrap, XRES_SUFFIX)
+#define XRES_UNWRAP_OR CAT_H(xres_unwrap_or, XRES_SUFFIX)
+#define XRES_UNWRAP_OR_ELSE CAT_H(xres_unwrap_or_else, XRES_SUFFIX)
+#define XRES_UNWRAP_UNCHECKED CAT_H(xres_unwrap_unchecked, XRES_SUFFIX)
 
 #ifdef XRES_INCL_STRUCT
 typedef struct XRES_NAME {
@@ -101,8 +107,9 @@ CXL_TYPE XRES_UNWRAP_UNCHECKED(XRES_NAME res) {
 #undef CXL_INCL_STRUCT
 #undef CXL_TYPE
 #undef CXL_SUFFIX
+#undef XRES_SUFFIX
 #undef CXL_DECL_ONLY
 
 #else
-#error "Must define CXL_TYPE and CXL_SUFFIX before including this file."
+#error "Must define CXL_TYPE before including this file."
 #endif

@@ -18,22 +18,8 @@
 #define CXL_RESULT_H
 #include <stdint.h>
 
-typedef struct XResult {
-  union {
-    void *ok;
-    uintptr_t err; // uintptr_t so it aligns with void*
-  } value;
-  bool is_err;
-  bool is_ok;
-} XResult;
-
-XResult xres_ok(void *ptr);
-XResult xres_err(uintptr_t err);
-
-void *xres_unwrap(XResult res);
-void *xres_unwrap_or(XResult res, void * or);
-void *xres_unwrap_or_else(XResult res, void *(*const f)(uintptr_t err));
-
-void *xres_unwrap_unchecked(XResult res);
+#define CXL_TYPE void *
+#define CXL_DECL_ONLY 1
+#include <cxl/gen/result.h>
 
 #endif
