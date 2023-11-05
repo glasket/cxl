@@ -15,25 +15,21 @@
 
 #include "ckdint.h"
 #include "common.h"
-#include <cxl/mem/alloc.h>
 #include <cxl/mem/buf.h>
 #include <cxl/option.h>
-#include <cxl/result.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <stdio.h>
 
-#define CXL_TYPE u8 *
-#define CXL_SUFFIX u8_ptr
-#include <cxl/gen/option.h>
-#undef CXL_TYPE
-#undef CXL_SUFFIX
+#define CXL_TYPE byte *
+#define CXL_SUFFIX byte_ptr
+#include <cxl/gen/result.h>
 
 struct XBuffer {
   XAllocator *alloc;
   XLayout layout;
-  u8 mem[];
+  byte mem[];
 };
 
 static XResult internal_xbuf_set_cap(XBuffer *buf, const usize cap) {
@@ -82,17 +78,17 @@ XResult xbuf_grow(XBuffer *buf) {
   return xbuf_grow_by(buf, buf->layout.size == 0 ? 1 : buf->layout.size);
 }
 
-XResult xbuf_grow_until(XBuffer *buf, const usize cap) {
+XResult xbuf_grow_until(XBuffer *buf, const usize target_cap) {
   usize new_size = buf->layout.size;
-  if (cap <= new_size) {
+  if (target_cap <= new_size) {
     return xres_ok(buf); // Already big enough
   }
 
-  while (new_size < cap) { // TODO Better algorithm
+  while (new_size < target_cap) { // TODO Better algorithm
     new_size *= 2;
   }
 
-  return xbuf_grow_by(buf, cap - buf->layout.size);
+  return xbuf_grow_by(buf, target_cap - buf->layout.size);
 }
 
 XResult xbuf_grow_by(XBuffer *buf, const usize increase) {
@@ -120,11 +116,11 @@ usize xbuf_alignment(const XBuffer *const buf) {
   return buf->layout.alignment;
 }
 
-XResult xbuf_access(XBuffer *const buf, const usize offset) {
+XResult_byte_ptr xbuf_access(XBuffer *const buf, const usize offset) {
   if (offset >= buf->layout.size) {
-    return xres_err(X_ERR_BOUNDS);
+    return xres_err_byte_ptr(X_ERR_BOUNDS);
   }
-  return xres_ok(&buf->mem[offset * buf->layout.alignment]);
+  return xres_ok_byte_ptr(&buf->mem[offset * buf->layout.alignment]);
 }
 
 XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc) {
@@ -137,11 +133,11 @@ XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *c
   return xres_ok(buf);
 }
 
-XOption_u8_ptr xbuf_ptr(XBuffer *const buf) {
+XOption_byte_ptr xbuf_ptr(XBuffer *const buf) {
   if (buf == nullptr || buf->layout.size == 0) {
-    return xopt_none_u8_ptr();
+    return xopt_none_byte_ptr();
   }
-  return xopt_some_u8_ptr(buf->mem);
+  return xopt_some_byte_ptr(buf->mem);
 }
 
 bool xbuf_check_alignment(const XBuffer *const buf, const XBuffer *const other) {

@@ -22,13 +22,15 @@
 #include <cxl/type.h>
 #include <stdlib.h>
 
-#define CXL_TYPE u8 *
-#define CXL_SUFFIX u8_ptr
+#define CXL_TYPE byte *
+#define CXL_SUFFIX byte_ptr
+#define CXL_DECL_ONLY 1
+#include <cxl/gen/result.h>
+
+#define CXL_TYPE byte *
+#define CXL_SUFFIX byte_ptr
 #define CXL_DECL_ONLY 1
 #include <cxl/gen/option.h>
-#undef CXL_TYPE
-#undef CXL_SUFFIX
-#undef CXL_DECL_ONLY
 
 /**
  * @brief Buffer type that represents a contiguous block of memory.
@@ -61,12 +63,12 @@ usize xbuf_alignment(const XBuffer *const buf);
 
 // TODO Maybe allow buf_realign?
 
-XResult xbuf_access(XBuffer *const buf, const usize offset);
+XResult_byte_ptr xbuf_access(XBuffer *const buf, const usize offset);
 
 // Converts an existing pointer into a buffer, copies the data.
 XResult xbuf_from_ptr(void *const ptr, const XLayout layout, const XAllocator *const alloc);
 
-XOption_u8_ptr xbuf_ptr(XBuffer *const buf);
+XOption_byte_ptr xbuf_ptr(XBuffer *const buf);
 
 bool xbuf_check_alignment(const XBuffer *const buf, const XBuffer *const other);
 

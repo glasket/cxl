@@ -89,6 +89,10 @@ CXL_TYPE XOPT_UNWRAP_OR_ELSE(XOPT_NAME opt, CXL_TYPE (*const f)(void)) {
 #undef XOPT_UNWRAP_OR
 #undef XOPT_UNWRAP_OR_ELSE
 #undef XOPT_INCL_STRUCT
+#undef CXL_INCL_STRUCT
+#undef CXL_TYPE
+#undef CXL_SUFFIX
+#undef CXL_DECL_ONLY
 
 #else
 #error "Must define CXL_TYPE and CXL_SUFFIX before including this file."

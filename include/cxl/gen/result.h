@@ -14,12 +14,11 @@
 #ifndef CXL_GEN_RESULT_H
 #define CXL_GEN_RESULT_H
 #include <assert.h>
+#include <cxl/macros.h>
 #include <stdint.h>
 #endif
 
 #if defined(CXL_TYPE) && defined(CXL_SUFFIX)
-
-#include <cxl/gen/option.h>
 
 #if defined(CXL_DECL_ONLY) && !defined(CXL_INCL_STRUCT) || defined(CXL_INCL_STRUCT)
 // We include on declaration only because Results can be statically allocated.
@@ -98,6 +97,11 @@ CXL_TYPE XRES_UNWRAP_UNCHECKED(XRES_NAME res) {
 #undef XRES_UNWRAP_OR
 #undef XRES_UNWRAP_OR_ELSE
 #undef XRES_UNWRAP_UNCHECKED
+#undef XRES_INCL_STRUCT
+#undef CXL_INCL_STRUCT
+#undef CXL_TYPE
+#undef CXL_SUFFIX
+#undef CXL_DECL_ONLY
 
 #else
 #error "Must define CXL_TYPE and CXL_SUFFIX before including this file."
